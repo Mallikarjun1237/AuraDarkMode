@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuraDark Controls</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>AuraDark</h1>
+          <span class="subtext">Eye Comfort & PDF Engine</span>
+        </div>
+      </div>
+      <div class="shortcut-tag" title="Keyboard Shortcut">Alt+Shift+D</div>
+    </header>
+
+    <!-- Master Switch Card -->
+    <div class="master-card">
+      <div class="master-info">
+        <span class="master-title">Dark Mode Engine</span>
+        <span class="master-subtitle" id="masterStatusText">Smart semantic theme active</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="masterToggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <!-- Current Site Exclude Switch -->
+    <div class="site-card">
+      <div class="site-info">
+        <span class="site-label">Current Site</span>
+        <span class="site-domain" id="currentDomain">Loading...</span>
+      </div>
+      <button class="site-toggle-btn" id="siteToggleBtn">Enabled</button>
+    </div>
+
+    <!-- Presets Section -->
+    <div class="section">
+      <label class="section-label">Color Themes</label>
+      <div class="preset-grid">
+        <button class="preset-btn active" data-preset="charcoal">
+          <span class="preset-swatch swatch-charcoal"></span>
+          <span>Charcoal</span>
+        </button>
+        <button class="preset-btn" data-preset="oled">
+          <span class="preset-swatch swatch-oled"></span>
+          <span>OLED Pitch</span>
+        </button>
+        <button class="preset-btn" data-preset="mocha">
+          <span class="preset-swatch swatch-mocha"></span>
+          <span>Warm Mocha</span>
+        </button>
+        <button class="preset-btn" data-preset="nord">
+          <span class="preset-swatch swatch-nord"></span>
+          <span>Nordic Slate</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Eye Comfort Sliders -->
+    <div class="section">
+      <label class="section-label">Eye Comfort Tuning</label>
+      
+      <!-- Warmth / Blue Light -->
+      <div class="slider-row">
+        <div class="slider-header">
+          <span>Warmth (Sepia)</span>
+          <span class="slider-val" id="valWarmth">0%</span>
+        </div>
+        <input type="range" id="inputWarmth" min="0" max="50" value="0">
+      </div>
+
+      <!-- Brightness -->
+      <div class="slider-row">
+        <div class="slider-header">
+          <span>Brightness</span>
+          <span class="slider-val" id="valBrightness">100%</span>
+        </div>
+        <input type="range" id="inputBrightness" min="70" max="110" value="100">
+      </div>
+
+      <!-- Contrast -->
+      <div class="slider-row">
+        <div class="slider-header">
+          <span>Contrast</span>
+          <span class="slider-val" id="valContrast">100%</span>
+        </div>
+        <input type="range" id="inputContrast" min="80" max="120" value="100">
+      </div>
+    </div>
+
+    <!-- Footer info & Quick Actions -->
+    <footer class="footer">
+      <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+        <span>Wispr Flow Widget Active</span>
+        <button id="resetWidgetBtn" style="background:none; border:none; color:#818cf8; font-size:10px; cursor:pointer; text-decoration:underline; padding:0;">Reset Widget</button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

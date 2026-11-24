@@ -1,0 +1,40 @@
+# OS-generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency and build output
+node_modules/
+dist/
+build/
+coverage/
+
+# Environment and secret files
+.env
+.env.*
+*.pem
+*.key
+
+# Extension packaging
+*.zip
+*.crx
+
+# Temporary and backup files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo

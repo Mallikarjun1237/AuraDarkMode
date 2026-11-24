@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuraDark Demo Portal & Test Page</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      margin: 0;
+      padding: 40px 20px;
+      background-color: #f8fafc;
+      color: #0f172a;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    header {
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    h1 {
+      font-size: 28px;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-blue { background: #dbeafe; color: #1d4ed8; }
+    .badge-green { background: #dcfce7; color: #15803d; }
+    .badge-amber { background: #fef3c7; color: #b45309; }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .card h2 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 10px 14px;
+      text-align: left;
+    }
+    th {
+      background-color: #f1f5f9;
+      font-weight: 600;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      margin-bottom: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+    button.btn-primary {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .media-box {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      margin-top: 15px;
+    }
+    .sample-image {
+      width: 140px;
+      height: 100px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h1>National Public Service & Official Document Portal</h1>
+        <span class="badge badge-green">Official Verification ID: 2026-X89</span>
+      </div>
+      <p>This test page simulates government portals and official white document pages where dark mode is typically absent.</p>
+    </header>
+
+    <!-- Test Section 1: Semantic Elevation & Colors -->
+    <div class="card">
+      <h2>1. Brand Colors, Badges & Elevational Depth</h2>
+      <p>Notice how buttons stay true blue, green badges remain natural green, and elevated cards have distinct charcoal depth instead of turning into an ugly negative X-ray.</p>
+      <div style="display:flex; gap:10px; margin: 15px 0; flex-wrap: wrap; align-items: center;">
+        <span class="badge badge-blue">Blue Indicator</span>
+        <span class="badge badge-green">Success Status</span>
+        <span class="badge badge-amber">Pending Document</span>
+        <!-- Inverse button and box tests -->
+        <span style="display:inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; background: #0f172a; color: #ffffff;">Dark Box (White Text)</span>
+        <span style="display:inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1;">Light Box (Dark Text)</span>
+      </div>
+      <div style="display:flex; gap:10px; margin-top: 15px;">
+        <button class="btn-primary">Official Submit Action</button>
+        <button style="background-color: #0f172a; color: #ffffff; border: 1px solid rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer;">Dark Action Button</button>
+      </div>
+    </div>
+
+    <!-- Test Section 2: Form Controls & Tables -->
+    <div class="card">
+      <h2>2. Official Data & Forms</h2>
+      <label for="applicant">Applicant Legal Name</label>
+      <input type="text" id="applicant" value="Mallikarjun" />
+
+      <label for="dept">Assigned Department</label>
+      <select id="dept">
+        <option>Ministry of Revenue & Documentation</option>
+        <option>Public Records Directorate</option>
+      </select>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Document Record</th>
+            <th>Issuing Authority</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>National Tax Summary 2026</td>
+            <td>Internal Audit Div</td>
+            <td><span class="badge badge-green">Verified</span></td>
+          </tr>
+          <tr>
+            <td>Property Clearance Deed</td>
+            <td>Municipal Registrar</td>
+            <td><span class="badge badge-blue">In Review</span></td>
+          </tr>
+          <tr>
+            <td>Official Affidavit #490</td>
+            <td>Civil Magistrate</td>
+            <td><span class="badge badge-amber">Pending</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Test Section 3: Media Protection Test -->
+    <div class="card">
+      <h2>3. Image & Photo Protection Test</h2>
+      <p>Photographs and official seals must NEVER be inverted into negative colors. Check the sample photo below:</p>
+      <div class="media-box">
+        <img class="sample-image" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300" alt="Sample Nature Image" />
+        <div>
+          <strong>Photo Verification:</strong>
+          <p style="margin: 4px 0; color: #64748b; font-size: 13px;">The blue sky, golden beach, and turquoise ocean should stay warm and natural in AuraDark.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Section 4: PDF & A4 Document Sheet Test -->
+    <div class="card">
+      <h2>4. PDF & A4 Document Sheet Test (WhatsApp & In-Browser PDF Simulation)</h2>
+      <p>Simulates document preview viewers (like PDF.js in WhatsApp Web, Google Drive previews, and government PDF viewers). The white A4 page must convert to comfortable dark slate, while black text becomes crisp readable off-white:</p>
+      
+      <div style="display:flex; justify-content:center; padding: 20px; background:#e2e8f0; border-radius:8px; margin-top:15px;" class="media-viewer">
+        <div style="box-shadow: 0 4px 16px rgba(0,0,0,0.15); border-radius: 4px; overflow: hidden;" class="pdfViewer">
+          <canvas id="sampleDocCanvas" width="360" height="480" style="display:block;"></canvas>
+        </div>
+      </div>
+      <script>
+        (function() {
+          const cvs = document.getElementById('sampleDocCanvas');
+          if (!cvs) return;
+          const ctx = cvs.getContext('2d');
+
+          // White A4 page background
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, 360, 480);
+
+          // Document Header
+          ctx.fillStyle = '#1e293b';
+          ctx.font = 'bold 15px -apple-system, sans-serif';
+          ctx.fillText('OFFICIAL CERTIFICATE & AFFIDAVIT', 24, 40);
+
+          ctx.fillStyle = '#64748b';
+          ctx.font = '10px -apple-system, sans-serif';
+          ctx.fillText('GOVERNMENT RECORD ARCHIVE • REF #2026-A4-DOC', 24, 58);
+
+          // Horizontal divider
+          ctx.strokeStyle = '#cbd5e1';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(24, 70);
+          ctx.lineTo(336, 70);
+          ctx.stroke();
+
+          // Document Body Paragraphs
+          ctx.fillStyle = '#334155';
+          ctx.font = '11px -apple-system, sans-serif';
+          ctx.fillText('This sample document simulates a standard A4 sheet rendered', 24, 100);
+          ctx.fillText('onto an HTML5 canvas, exactly as WhatsApp Web and PDF.js do.', 24, 118);
+          ctx.fillText('In AuraDark, the blinding white paper is automatically converted', 24, 136);
+          ctx.fillText('to dark slate, and this dark text turns crisp, high-contrast white.', 24, 154);
+
+          // Table outline
+          ctx.strokeRect(24, 180, 312, 120);
+          ctx.fillStyle = '#f8fafc';
+          ctx.fillRect(25, 181, 310, 24);
+          ctx.fillStyle = '#0f172a';
+          ctx.font = 'bold 10px -apple-system, sans-serif';
+          ctx.fillText('SECTION', 36, 197);
+          ctx.fillText('STATUS', 150, 197);
+          ctx.fillText('REMARKS', 240, 197);
+
+          ctx.font = '10px -apple-system, sans-serif';
+          ctx.fillStyle = '#334155';
+          ctx.fillText('01. Identification', 36, 230);
+          ctx.fillText('Approved', 150, 230);
+          ctx.fillText('Valid until 2030', 240, 230);
+
+          ctx.fillText('02. Clearance', 36, 260);
+          ctx.fillText('Complete', 150, 260);
+          ctx.fillText('No liabilities', 240, 260);
+
+          // Official seal stamp (color circle)
+          ctx.strokeStyle = '#2563eb';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(280, 400, 30, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.fillStyle = '#2563eb';
+          ctx.font = 'bold 8px -apple-system, sans-serif';
+          ctx.fillText('OFFICIAL SEAL', 255, 402);
+          ctx.fillText('VERIFIED 2026', 257, 412);
+        })();
+      </script>
+    </div>
+  </div>
+</body>
+</html>

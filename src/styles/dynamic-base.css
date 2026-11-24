@@ -1,0 +1,119 @@
+/**
+ * AuraDark Perceptual Engine
+ * Mathematically transforms light surfaces into dark surfaces while
+ * preserving 100% of original hues, contrast ratios, and photographs.
+ * 
+ * Scoped correctly so the floating widget stays in its native dark theme
+ * in BOTH light and dark mode.
+ */
+
+/* Root Perceptual Transformation (Active Dark Mode) */
+html[data-auradark-active="true"] {
+  filter: invert(90%) hue-rotate(180deg) contrast(92%) brightness(96%) !important;
+  background-color: #121316 !important;
+}
+
+/* Preset: OLED Pitch Black */
+html[data-auradark-active="true"][data-auradark-preset="oled"] {
+  filter: invert(100%) hue-rotate(180deg) contrast(105%) !important;
+  background-color: #000000 !important;
+}
+
+/* Preset: Warm Mocha (Reading & eye strain relief) */
+html[data-auradark-active="true"][data-auradark-preset="mocha"] {
+  filter: invert(88%) hue-rotate(180deg) sepia(30%) contrast(90%) brightness(94%) !important;
+  background-color: #171412 !important;
+}
+
+/* Preset: Nordic Slate */
+html[data-auradark-active="true"][data-auradark-preset="nord"] {
+  filter: invert(90%) hue-rotate(180deg) saturate(110%) contrast(94%) !important;
+  background-color: #111822 !important;
+}
+
+/* =========================================================================
+   MEDIA PROTECTION: COUNTER-INVERSION
+   ========================================================================= */
+
+html[data-auradark-active="true"] img,
+html[data-auradark-active="true"] video,
+html[data-auradark-active="true"] iframe:not([src*=".pdf"]):not([src*="blob:"]),
+html[data-auradark-active="true"] [style*="background-image"],
+html[data-auradark-active="true"] embed:not([type="application/pdf"]),
+html[data-auradark-active="true"] object:not([type="application/pdf"]) {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
+html[data-auradark-active="true"] svg image {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
+html[data-auradark-active="true"] canvas {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
+/* =========================================================================
+   PDF, A4 SHEETS & DOCUMENT CANVAS DARK MODE
+   ========================================================================= */
+
+html[data-auradark-active="true"] embed[type="application/pdf"],
+html[data-auradark-active="true"] object[type="application/pdf"] {
+  filter: invert(90%) hue-rotate(180deg) contrast(95%) brightness(95%) !important;
+  background-color: #121316 !important;
+}
+
+html[data-auradark-active="true"] div[data-animate-media-viewer="true"] canvas,
+html[data-auradark-active="true"] div[role="dialog"] canvas,
+html[data-auradark-active="true"] div[title*=".pdf"] canvas,
+html[data-auradark-active="true"] div[aria-label*="PDF"] canvas,
+html[data-auradark-active="true"] div[aria-label*="Document"] canvas,
+html[data-auradark-active="true"] .media-viewer canvas,
+html[data-auradark-active="true"] [class*="media-viewer"] canvas {
+  filter: none !important;
+  background-color: #16181d !important;
+}
+
+html[data-auradark-active="true"] .pdfViewer canvas,
+html[data-auradark-active="true"] .page canvas,
+html[data-auradark-active="true"] .canvasWrapper canvas,
+html[data-auradark-active="true"] [data-page-number] canvas,
+html[data-auradark-active="true"] .react-pdf__Page__canvas,
+html[data-auradark-active="true"] [class*="pdf"] canvas,
+html[data-auradark-active="true"] [class*="document"] canvas,
+html[data-auradark-active="true"] [class*="reader"] canvas,
+html[data-auradark-active="true"] [class*="viewer"] canvas,
+html[data-auradark-active="true"] [id*="viewer"] canvas,
+html[data-auradark-active="true"] [data-auradark-doc-canvas="true"] {
+  filter: none !important;
+  background-color: #16181d !important;
+}
+
+html[data-auradark-active="true"] .pdfViewer .page,
+html[data-auradark-active="true"] .page[data-page-number],
+html[data-auradark-active="true"] .canvasWrapper {
+  background-color: #16181d !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* =========================================================================
+   WISPR FLOW FLOATING WIDGET PROTECTION
+   CRITICAL: ONLY counter-invert the widget when dark mode is ACTIVE on the page!
+   When dark mode is OFF, the widget is NOT inverted so its dropdown and badge
+   maintain a pure dark background (#14161f) at all times!
+   ========================================================================= */
+
+html[data-auradark-active="true"] #auradark-floating-host {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
+html:not([data-auradark-active="true"]) #auradark-floating-host {
+  filter: none !important;
+}
+
+#auradark-floating-host {
+  z-index: 2147483647 !important;
+  pointer-events: auto !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
