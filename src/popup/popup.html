@@ -47,7 +47,10 @@
 
     <!-- Presets Section -->
     <div class="section">
-      <label class="section-label">Color Themes</label>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <label class="section-label">Color Themes</label>
+        <span id="themeTierBadge" style="font-size:9px; font-weight:700; color:#818cf8; text-transform:uppercase;">8 Themes</span>
+      </div>
       <div class="preset-grid">
         <button class="preset-btn active" data-preset="charcoal">
           <span class="preset-swatch swatch-charcoal"></span>
@@ -65,6 +68,22 @@
           <span class="preset-swatch swatch-nord"></span>
           <span>Nordic Slate</span>
         </button>
+        <button class="preset-btn" data-preset="cyberpunk">
+          <span class="preset-swatch swatch-cyberpunk"></span>
+          <span>Cyberpunk</span>
+        </button>
+        <button class="preset-btn" data-preset="emerald">
+          <span class="preset-swatch swatch-emerald"></span>
+          <span>Forest Night</span>
+        </button>
+        <button class="preset-btn" data-preset="dracula">
+          <span class="preset-swatch swatch-dracula"></span>
+          <span>Dracula Plum</span>
+        </button>
+        <button class="preset-btn" data-preset="e-ink">
+          <span class="preset-swatch swatch-eink"></span>
+          <span>E-Ink Paper</span>
+        </button>
       </div>
     </div>
 
@@ -75,7 +94,7 @@
       <!-- Warmth / Blue Light -->
       <div class="slider-row">
         <div class="slider-header">
-          <span>Warmth (Sepia)</span>
+          <span>Warmth (Blue-Light Filter)</span>
           <span class="slider-val" id="valWarmth">0%</span>
         </div>
         <input type="range" id="inputWarmth" min="0" max="50" value="0">
@@ -97,6 +116,36 @@
           <span class="slider-val" id="valContrast">100%</span>
         </div>
         <input type="range" id="inputContrast" min="80" max="120" value="100">
+      </div>
+    </div>
+
+    <!-- Accessibility Suite -->
+    <div class="section">
+      <label class="section-label">Accessibility & Reading</label>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <label style="display:flex; justify-content:space-between; align-items:center; background:#171821; border:1px solid rgba(255,255,255,0.08); padding:7px 10px; border-radius:8px; cursor:pointer; font-size:11px;">
+          <span>High-Contrast Text Booster</span>
+          <input type="checkbox" id="toggleBoostContrast" style="accent-color:#6366f1; cursor:pointer;">
+        </label>
+        <label style="display:flex; justify-content:space-between; align-items:center; background:#171821; border:1px solid rgba(255,255,255,0.08); padding:7px 10px; border-radius:8px; cursor:pointer; font-size:11px;">
+          <span>Dyslexia-Friendly Font</span>
+          <input type="checkbox" id="toggleDyslexicFont" style="accent-color:#6366f1; cursor:pointer;">
+        </label>
+      </div>
+    </div>
+
+    <!-- License Activation Card -->
+    <div class="section" id="licenseSection" style="background:#13151f; border:1px solid rgba(99,102,241,0.25); border-radius:10px; padding:9px 11px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span style="font-size:11px; font-weight:700; color:#ffffff;">AuraDark Pro License</span>
+          <div style="font-size:9.5px; color:#94a3b8;" id="licenseStatusText">Unlocked (Personal License)</div>
+        </div>
+        <button id="btnEnterKey" style="background:rgba(99,102,241,0.2); border:1px solid #6366f1; color:#c7d2fe; font-size:10px; font-weight:600; padding:4px 8px; border-radius:6px; cursor:pointer;">Enter Key</button>
+      </div>
+      <div id="keyInputRow" style="display:none; margin-top:8px; gap:6px;">
+        <input type="text" id="licenseKeyInput" placeholder="AURA-XXXX-XXXX-XXXX" style="flex:1; background:#0f1015; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff; font-size:10px; padding:4px 6px; outline:none; text-transform:uppercase;">
+        <button id="btnActivateKey" style="background:#4f46e5; border:none; color:#fff; font-size:10px; font-weight:600; padding:4px 8px; border-radius:6px; cursor:pointer;">Activate</button>
       </div>
     </div>
 

@@ -261,6 +261,10 @@ input:checked + .slider:before {
 .swatch-oled { background: #000000; }
 .swatch-mocha { background: #171412; }
 .swatch-nord { background: #111822; }
+.swatch-cyberpunk { background: #0f0c1b; border-color: #06b6d4; }
+.swatch-emerald { background: #0b1712; border-color: #10b981; }
+.swatch-dracula { background: #181324; border-color: #a855f7; }
+.swatch-eink { background: #111111; border-color: #94a3b8; }
 
 /* Sliders */
 .slider-row {

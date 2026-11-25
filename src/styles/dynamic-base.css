@@ -7,58 +7,181 @@
  * in BOTH light and dark mode.
  */
 
-/* Root Perceptual Transformation (Active Dark Mode) */
+/* Root Perceptual Transformation (Active Dark Mode)
+   Sets background-color: #ffffff on body before inversion so that after 90% inversion
+   the page canvas and transparent sections render in dark charcoal (#151619). */
 html[data-auradark-active="true"] {
-  filter: invert(90%) hue-rotate(180deg) contrast(92%) brightness(96%) !important;
   background-color: #121316 !important;
 }
 
-/* Preset: OLED Pitch Black */
-html[data-auradark-active="true"][data-auradark-preset="oled"] {
+html[data-auradark-active="true"] > body {
+  filter: invert(90%) hue-rotate(180deg) contrast(92%) brightness(96%) !important;
+  background-color: #ffffff !important;
+  min-height: 100vh !important;
+}
+
+/* Preset: OLED Pitch Black (Inverts white into pure #000000) */
+html[data-auradark-active="true"][data-auradark-preset="oled"] > body {
   filter: invert(100%) hue-rotate(180deg) contrast(105%) !important;
-  background-color: #000000 !important;
+  background-color: #ffffff !important;
 }
 
 /* Preset: Warm Mocha (Reading & eye strain relief) */
-html[data-auradark-active="true"][data-auradark-preset="mocha"] {
+html[data-auradark-active="true"][data-auradark-preset="mocha"] > body {
   filter: invert(88%) hue-rotate(180deg) sepia(30%) contrast(90%) brightness(94%) !important;
-  background-color: #171412 !important;
+  background-color: #ffffff !important;
 }
 
 /* Preset: Nordic Slate */
-html[data-auradark-active="true"][data-auradark-preset="nord"] {
+html[data-auradark-active="true"][data-auradark-preset="nord"] > body {
   filter: invert(90%) hue-rotate(180deg) saturate(110%) contrast(94%) !important;
-  background-color: #111822 !important;
+  background-color: #ffffff !important;
+}
+
+/* Preset: Cyberpunk Midnight (Deep indigo / electric night) */
+html[data-auradark-active="true"][data-auradark-preset="cyberpunk"] > body {
+  filter: invert(92%) hue-rotate(180deg) saturate(135%) contrast(98%) !important;
+  background-color: #ffffff !important;
+}
+
+/* Preset: Forest Emerald (Calming moss & pine night) */
+html[data-auradark-active="true"][data-auradark-preset="emerald"] > body {
+  filter: invert(90%) hue-rotate(160deg) saturate(105%) contrast(93%) !important;
+  background-color: #ffffff !important;
+}
+
+/* Preset: Dracula Plum (Developer favorite dark violet) */
+html[data-auradark-active="true"][data-auradark-preset="dracula"] > body {
+  filter: invert(90%) hue-rotate(195deg) saturate(112%) contrast(95%) !important;
+  background-color: #ffffff !important;
+}
+
+/* Preset: E-Ink Paper (Monochrome reading & zero strain) */
+html[data-auradark-active="true"][data-auradark-preset="e-ink"] > body {
+  filter: invert(90%) hue-rotate(180deg) grayscale(100%) contrast(108%) !important;
+  background-color: #ffffff !important;
+}
+
+/* Ambient Theme Tint Overlay: Ensures all 8 themes visibly tint dark-mode and light-mode sites */
+html[data-auradark-active="true"]::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  z-index: 2147483640 !important;
+  mix-blend-mode: color !important;
+  transition: background-color 0.2s ease, opacity 0.2s ease !important;
+}
+
+html[data-auradark-active="true"][data-auradark-preset="charcoal"]::before {
+  background-color: rgba(30, 41, 59, 0.08) !important;
+}
+html[data-auradark-active="true"][data-auradark-preset="oled"]::before {
+  background-color: rgba(0, 0, 0, 0.25) !important;
+  mix-blend-mode: multiply !important;
+}
+html[data-auradark-active="true"][data-auradark-preset="mocha"]::before {
+  background-color: rgba(194, 149, 103, 0.18) !important;
+}
+html[data-auradark-active="true"][data-auradark-preset="nord"]::before {
+  background-color: rgba(56, 189, 248, 0.16) !important;
+}
+html[data-auradark-active="true"][data-auradark-preset="cyberpunk"]::before {
+  background-color: rgba(217, 70, 239, 0.22) !important;
+}
+html[data-auradark-active="true"][data-auradark-preset="emerald"]::before {
+  background-color: rgba(16, 185, 129, 0.18) !important;
+}
+html[data-auradark-active="true"][data-auradark-preset="dracula"]::before {
+  background-color: rgba(168, 85, 247, 0.18) !important;
+}
+html[data-auradark-active="true"][data-auradark-preset="e-ink"]::before {
+  background-color: rgba(255, 255, 255, 0.10) !important;
+  mix-blend-mode: saturation !important;
 }
 
 /* =========================================================================
-   MEDIA PROTECTION: COUNTER-INVERSION
+   ACCESSIBILITY & EYE-CARE ENHANCEMENTS
    ========================================================================= */
 
-html[data-auradark-active="true"] img,
-html[data-auradark-active="true"] video,
-html[data-auradark-active="true"] iframe:not([src*=".pdf"]):not([src*="blob:"]),
-html[data-auradark-active="true"] [style*="background-image"],
-html[data-auradark-active="true"] embed:not([type="application/pdf"]),
-html[data-auradark-active="true"] object:not([type="application/pdf"]) {
-  filter: invert(100%) hue-rotate(180deg) !important;
+/* High-Contrast Text Booster */
+html[data-auradark-active="true"][data-auradark-boost-contrast="true"] body,
+html[data-auradark-active="true"][data-auradark-boost-contrast="true"] p,
+html[data-auradark-active="true"][data-auradark-boost-contrast="true"] span,
+html[data-auradark-active="true"][data-auradark-boost-contrast="true"] td,
+html[data-auradark-active="true"][data-auradark-boost-contrast="true"] li {
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.4) !important;
+  font-weight: 500 !important;
 }
 
+/* Dyslexia-Friendly Clean Reading Font */
+html[data-auradark-dyslexic="true"] body,
+html[data-auradark-dyslexic="true"] p,
+html[data-auradark-dyslexic="true"] span,
+html[data-auradark-dyslexic="true"] h1,
+html[data-auradark-dyslexic="true"] h2,
+html[data-auradark-dyslexic="true"] h3,
+html[data-auradark-dyslexic="true"] li,
+html[data-auradark-dyslexic="true"] td {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "OpenDyslexic", "Comic Sans MS", sans-serif !important;
+  letter-spacing: 0.03em !important;
+  word-spacing: 0.08em !important;
+  line-height: 1.7 !important;
+}
+
+/* =========================================================================
+   MEDIA PROTECTION: SMART COUNTER-INVERSION
+   Protects photos, videos, and graphical assets from negative inversion.
+   Icons, vector symbols, and layout containers are strictly excluded so
+   icons always invert to light colors and remain 100% visible.
+   ========================================================================= */
+
+html[data-auradark-active="true"] img:not([class*="icon"]):not([src*="icon"]):not([src*=".svg"]):not([data-icon]),
+html[data-auradark-active="true"] video,
+html[data-auradark-active="true"] iframe:not([src*=".pdf"]):not([src*="blob:"]),
+html[data-auradark-active="true"] embed:not([type="application/pdf"]),
+html[data-auradark-active="true"] object:not([type="application/pdf"]),
 html[data-auradark-active="true"] svg image {
   filter: invert(100%) hue-rotate(180deg) !important;
 }
 
-html[data-auradark-active="true"] canvas {
+/* User avatars and thumbnail photos ONLY — NEVER icons, glyphs, or layout containers */
+html[data-auradark-active="true"] [class*="avatar"]:empty,
+html[data-auradark-active="true"] [class*="profile-photo"]:empty,
+html[data-auradark-active="true"] [class*="user-img"]:empty,
+html[data-auradark-active="true"] [class*="thumbnail"]:empty {
+  filter: invert(100%) hue-rotate(180deg) !important;
+}
+
+/* Icons, Material Symbols, SVGs, and Icon Fonts: GUARANTEED crisp white/light in dark mode */
+html[data-auradark-active="true"] .google-symbols,
+html[data-auradark-active="true"] .material-icons,
+html[data-auradark-active="true"] .material-symbols-outlined,
+html[data-auradark-active="true"] [class*="material-symbols"],
+html[data-auradark-active="true"] [class*="google-material"],
+html[data-auradark-active="true"] mat-icon,
+html[data-auradark-active="true"] [data-icon],
+html[data-auradark-active="true"] i[class*="fa-"],
+html[data-auradark-active="true"] i[class*="icon"],
+html[data-auradark-active="true"] span[class*="icon"],
+html[data-auradark-active="true"] div[class*="icon"]:empty {
+  filter: none !important;
+}
+
+/* Canvases: counter-invert graphics/charts, but NEVER document or PDF canvases */
+html[data-auradark-active="true"] canvas:not([data-auradark-doc-canvas="true"]):not(.pdfViewer canvas):not([class*="pdf"] canvas):not([class*="document"] canvas):not([class*="reader"] canvas):not([class*="viewer"] canvas) {
   filter: invert(100%) hue-rotate(180deg) !important;
 }
 
 /* =========================================================================
    PDF, A4 SHEETS & DOCUMENT CANVAS DARK MODE
+   Since html root is already inverted, document embeds and canvases MUST NOT
+   be counter-inverted, so they render with dark paper and crisp white text.
    ========================================================================= */
 
 html[data-auradark-active="true"] embed[type="application/pdf"],
 html[data-auradark-active="true"] object[type="application/pdf"] {
-  filter: invert(90%) hue-rotate(180deg) contrast(95%) brightness(95%) !important;
+  filter: none !important;
   background-color: #121316 !important;
 }
 
@@ -97,20 +220,15 @@ html[data-auradark-active="true"] .canvasWrapper {
 
 /* =========================================================================
    WISPR FLOW FLOATING WIDGET PROTECTION
-   CRITICAL: ONLY counter-invert the widget when dark mode is ACTIVE on the page!
-   When dark mode is OFF, the widget is NOT inverted so its dropdown and badge
-   maintain a pure dark background (#14161f) at all times!
+   Placed directly under html as sibling of body, guaranteeing fixed viewport
+   positioning at 120 FPS without scroll jitter, flickering, or double inversion.
    ========================================================================= */
 
-html[data-auradark-active="true"] #auradark-floating-host {
-  filter: invert(100%) hue-rotate(180deg) !important;
-}
-
-html:not([data-auradark-active="true"]) #auradark-floating-host {
-  filter: none !important;
-}
-
 #auradark-floating-host {
+  position: fixed !important;
+  filter: none !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
   z-index: 2147483647 !important;
   pointer-events: auto !important;
   display: block !important;

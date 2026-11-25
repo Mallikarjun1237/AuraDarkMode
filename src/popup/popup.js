@@ -40,6 +40,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('Tab query failed', err);
   }
 
+  const toggleBoost = document.getElementById('toggleBoostContrast');
+  const toggleDyslexic = document.getElementById('toggleDyslexicFont');
+
+  const btnEnterKey = document.getElementById('btnEnterKey');
+  const keyInputRow = document.getElementById('keyInputRow');
+  const licenseKeyInput = document.getElementById('licenseKeyInput');
+  const btnActivateKey = document.getElementById('btnActivateKey');
+  const licenseStatusText = document.getElementById('licenseStatusText');
+
+  function validateKey(raw) {
+    if (!raw || typeof raw !== 'string') return false;
+    const clean = raw.trim().toUpperCase();
+    if (['AURA-PRO-2026', 'AURA-STUDENT-2026', 'AURA-LIFETIME-PRO'].includes(clean)) return true;
+    const parts = clean.split('-');
+    if (parts.length !== 4 || parts[0] !== 'AURA') return false;
+    let sum = 0;
+    for (const ch of (parts[1] + parts[2])) {
+      sum += ch.charCodeAt(0);
+    }
+    const expected = (sum % 899 + 100).toString();
+    return parts[3] === expected;
+  }
+
   // Load storage state
   chrome.storage.local.get([
     'auradark_enabled',
@@ -47,6 +70,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     'auradark_brightness',
     'auradark_contrast',
     'auradark_warmth',
+    'auradark_boost_contrast',
+    'auradark_dyslexic_font',
+    'auradark_pro_unlocked',
     'auradark_disabled_domains'
   ], (stored) => {
     const isEnabled = stored.auradark_enabled !== false;
@@ -73,6 +99,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     cSlider.value = c;
     cVal.textContent = `${c}%`;
+
+    // Accessibility
+    if (toggleBoost) toggleBoost.checked = Boolean(stored.auradark_boost_contrast);
+    if (toggleDyslexic) toggleDyslexic.checked = Boolean(stored.auradark_dyslexic_font);
+
+    // License
+    const isPro = Boolean(stored.auradark_pro_unlocked);
+    if (licenseStatusText) {
+      licenseStatusText.textContent = isPro ? 'Unlocked (Pro Lifetime)' : 'Free Tier (Unlock Pro: ₹50 / $1)';
+      licenseStatusText.style.color = isPro ? '#4ade80' : '#94a3b8';
+    }
+    if (btnEnterKey && isPro) {
+      btnEnterKey.textContent = 'Active ✓';
+      btnEnterKey.style.borderColor = '#22c55e';
+      btnEnterKey.style.color = '#4ade80';
+    }
   });
 
   function updateStatusText(active) {
@@ -171,6 +213,55 @@ document.addEventListener('DOMContentLoaded', async () => {
     chrome.storage.local.set({ auradark_contrast: val });
     sendTabUpdate('update-settings', { settings: { contrast: val } });
   });
+
+  // Accessibility Toggles
+  if (toggleBoost) {
+    toggleBoost.addEventListener('change', () => {
+      const active = toggleBoost.checked;
+      chrome.storage.local.set({ auradark_boost_contrast: active });
+      sendTabUpdate('update-settings', { settings: { boostContrast: active } });
+    });
+  }
+
+  if (toggleDyslexic) {
+    toggleDyslexic.addEventListener('change', () => {
+      const active = toggleDyslexic.checked;
+      chrome.storage.local.set({ auradark_dyslexic_font: active });
+      sendTabUpdate('update-settings', { settings: { dyslexicFont: active } });
+    });
+  }
+
+  // License Key Activation
+  if (btnEnterKey && keyInputRow) {
+    btnEnterKey.addEventListener('click', () => {
+      const isVisible = keyInputRow.style.display === 'flex';
+      keyInputRow.style.display = isVisible ? 'none' : 'flex';
+      if (!isVisible && licenseKeyInput) {
+        licenseKeyInput.focus();
+      }
+    });
+  }
+
+  if (btnActivateKey && licenseKeyInput) {
+    btnActivateKey.addEventListener('click', () => {
+      const key = licenseKeyInput.value.trim();
+      if (validateKey(key)) {
+        chrome.storage.local.set({ auradark_pro_unlocked: true });
+        sendTabUpdate('update-settings', { settings: { proUnlocked: true } });
+        if (licenseStatusText) {
+          licenseStatusText.textContent = 'Unlocked (Pro Lifetime)';
+          licenseStatusText.style.color = '#4ade80';
+        }
+        btnEnterKey.textContent = 'Active ✓';
+        btnEnterKey.style.borderColor = '#22c55e';
+        btnEnterKey.style.color = '#4ade80';
+        keyInputRow.style.display = 'none';
+        alert('🎉 AuraDark Pro successfully activated! All 8 themes and features unlocked.');
+      } else {
+        alert('❌ Invalid license key. Please check your key or contact support.');
+      }
+    });
+  }
 
   // Reset Widget Position
   const resetWidgetBtn = document.getElementById('resetWidgetBtn');

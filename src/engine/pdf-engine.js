@@ -53,7 +53,17 @@ class AuraPdfEngine {
 
       if (isInsideDocViewer || isA4Ratio) {
         canvas.setAttribute('data-auradark-doc-canvas', 'true');
-        canvas.style.setProperty('filter', 'none', 'important');
+
+        // If html root is inverted by color-engine, canvas needs filter: none to inherit the inversion.
+        // If html root is NOT inverted (e.g. WhatsApp Web native dark mode), canvas directly inverts!
+        const isHtmlInverted = document.documentElement.hasAttribute('data-auradark-active') &&
+                               !window.location.hostname.includes('web.whatsapp.com');
+
+        if (isHtmlInverted) {
+          canvas.style.setProperty('filter', 'none', 'important');
+        } else {
+          canvas.style.setProperty('filter', 'invert(90%) hue-rotate(180deg) contrast(95%) brightness(95%)', 'important');
+        }
         canvas.style.setProperty('background-color', '#16181d', 'important');
 
         // Style the parent container if it's a paper wrapper

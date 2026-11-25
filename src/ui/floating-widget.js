@@ -7,9 +7,10 @@
  */
 
 class AuraFloatingWidget {
-  constructor(onToggle, onSettingChange) {
+  constructor(onToggle, onSettingChange, onPositionChange) {
     this.onToggle = onToggle;
     this.onSettingChange = onSettingChange;
+    this.onPositionChange = onPositionChange;
     this.host = null;
     this.shadow = null;
     this.isExpanded = false;
@@ -48,7 +49,8 @@ class AuraFloatingWidget {
     this.render();
     this.setupInteractions();
 
-    const targetParent = document.body || document.documentElement;
+    // Mount to documentElement for absolute persistence across SPA route changes
+    const targetParent = document.documentElement || document.body;
     if (targetParent) {
       targetParent.appendChild(this.host);
     }
@@ -56,43 +58,74 @@ class AuraFloatingWidget {
     this.updateScreenPosition();
     this.ensurePersistence();
 
-    // Viewport-lock listeners: keep widget firmly on visible screen during scroll/resize
-    this.scrollHandler = () => this.updateScreenPosition();
-    window.addEventListener('scroll', this.scrollHandler, { passive: true });
-    window.addEventListener('resize', this.scrollHandler, { passive: true });
+    // Resize listener: keep widget firmly within screen bounds on window resize
+    this.resizeHandler = () => this.updateScreenPosition();
+    window.addEventListener('resize', this.resizeHandler, { passive: true });
   }
 
   /**
-   * Pinned viewport positioning: prevents widget from scrolling off-screen
-   * when CSS filters create a new containing block on html/body.
+   * Pinned viewport positioning: keeps widget fixed to the screen without scroll lag or flickering
    */
   updateScreenPosition() {
     if (!this.host) return;
 
-    const isFiltered = document.documentElement.hasAttribute('data-auradark-active');
-    const maxW = Math.max(160, (window.innerWidth || 1024) - 120);
-    const maxH = Math.max(160, (window.innerHeight || 768) - 45);
+    // Fixed physical pill dimensions: keeps host anchor point rock-solid regardless of flyout state
+    const pillW = 90;
+    const pillH = 28;
+    const maxW = Math.max(80, (window.innerWidth || 1024) - pillW - 10);
+    const maxH = Math.max(80, (window.innerHeight || 768) - pillH - 10);
     
     this.currentPos.x = Math.max(10, Math.min(maxW, this.currentPos.x));
     this.currentPos.y = Math.max(10, Math.min(maxH, this.currentPos.y));
 
-    if (isFiltered) {
-      // Anchored to viewport window using scroll offset
-      const topPos = window.scrollY + window.innerHeight - this.currentPos.y - (this.host.offsetHeight || 28);
-      const leftPos = window.scrollX + window.innerWidth - this.currentPos.x - (this.host.offsetWidth || 90);
-      this.host.style.position = 'absolute';
-      this.host.style.top = `${topPos}px`;
-      this.host.style.left = `${leftPos}px`;
-      this.host.style.bottom = 'auto';
-      this.host.style.right = 'auto';
-    } else {
-      // Standard fixed positioning
-      this.host.style.position = 'fixed';
-      this.host.style.bottom = `${this.currentPos.y}px`;
-      this.host.style.right = `${this.currentPos.x}px`;
-      this.host.style.top = 'auto';
-      this.host.style.left = 'auto';
+    // Pure hardware-composited fixed positioning: completely eliminates scroll flicker & jitter
+    this.host.style.position = 'fixed';
+    this.host.style.bottom = `${this.currentPos.y}px`;
+    this.host.style.right = `${this.currentPos.x}px`;
+    this.host.style.top = 'auto';
+    this.host.style.left = 'auto';
+    this.host.style.transform = 'translateZ(0)';
+    this.host.style.willChange = 'transform';
+
+    this.updateDropdownPlacement();
+  }
+
+  /**
+   * Smart collision auto-placement: checks screen edges so dropdown never cuts off
+   */
+  updateDropdownPlacement() {
+    const flyoutCard = this.shadow?.getElementById('flyoutCard');
+    if (!flyoutCard) return;
+
+    // Check if widget is in the top half of viewport (less than 380px from top)
+    const isNearTop = this.currentPos.y > ((window.innerHeight || 768) - 380);
+    // Check if widget is near the left edge of viewport (less than 270px from left)
+    const isNearLeft = this.currentPos.x > ((window.innerWidth || 1024) - 270);
+
+    flyoutCard.classList.toggle('placement-below', isNearTop);
+    flyoutCard.classList.toggle('placement-above', !isNearTop);
+    flyoutCard.classList.toggle('align-left', isNearLeft);
+    flyoutCard.classList.toggle('align-right', !isNearLeft);
+  }
+
+  toggleDropdown() {
+    this.isExpanded = !this.isExpanded;
+    if (this.isExpanded) {
+      this.updateDropdownPlacement();
     }
+    const flyoutCard = this.shadow?.getElementById('flyoutCard');
+    const expandBtn = this.shadow?.getElementById('expandBtn');
+    if (flyoutCard) flyoutCard.classList.toggle('visible', this.isExpanded);
+    if (expandBtn) expandBtn.classList.toggle('open', this.isExpanded);
+  }
+
+  closeDropdown() {
+    if (!this.isExpanded) return;
+    this.isExpanded = false;
+    const flyoutCard = this.shadow?.getElementById('flyoutCard');
+    const expandBtn = this.shadow?.getElementById('expandBtn');
+    if (flyoutCard) flyoutCard.classList.remove('visible');
+    if (expandBtn) expandBtn.classList.remove('open');
   }
 
   applyHostStyles() {
@@ -101,6 +134,10 @@ class AuraFloatingWidget {
     this.host.style.zIndex = '2147483647';
     this.host.style.bottom = `${this.currentPos.y}px`;
     this.host.style.right = `${this.currentPos.x}px`;
+    this.host.style.top = 'auto';
+    this.host.style.left = 'auto';
+    this.host.style.transform = 'translateZ(0)';
+    this.host.style.willChange = 'transform';
     this.host.style.pointerEvents = 'auto';
     this.host.style.display = 'block';
     this.host.style.visibility = 'visible';
@@ -117,7 +154,7 @@ class AuraFloatingWidget {
     if (this.domWatcher) return;
 
     const reattach = () => {
-      const targetParent = document.body || document.documentElement;
+      const targetParent = document.documentElement || document.body;
       if (this.host && !document.contains(this.host) && targetParent) {
         targetParent.appendChild(this.host);
         this.updateScreenPosition();
@@ -125,7 +162,7 @@ class AuraFloatingWidget {
     };
 
     this.domWatcher = new MutationObserver(reattach);
-    const observeTarget = document.body || document.documentElement;
+    const observeTarget = document.documentElement;
     if (observeTarget) {
       this.domWatcher.observe(observeTarget, { childList: true, subtree: false });
     }
@@ -145,11 +182,9 @@ class AuraFloatingWidget {
   resetPosition() {
     this.currentPos = { x: 24, y: 24 };
     this.updateScreenPosition();
-    try {
-      if (typeof chrome !== 'undefined' && chrome.runtime?.id && chrome.storage?.local) {
-        chrome.storage.local.set({ auradark_widget_pos: this.currentPos });
-      }
-    } catch (_) {}
+    if (this.onPositionChange) {
+      this.onPositionChange(this.currentPos);
+    }
   }
 
   render() {
@@ -164,10 +199,8 @@ class AuraFloatingWidget {
 
         .widget-container {
           position: relative;
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: 6px;
+          width: fit-content;
+          height: fit-content;
         }
 
         /* Slim Compact Pill: clean matte shadow, no glowing neon */
@@ -290,25 +323,69 @@ class AuraFloatingWidget {
 
         /* Quick Settings Panel: Guaranteed DARK background (#14161f) in all modes */
         .flyout-card {
+          position: absolute;
           width: 250px;
+          max-height: min(390px, calc(100vh - 60px));
+          overflow-y: auto;
           padding: 12px 14px;
           background: #14161f !important;
           color: #f1f5f9 !important;
           border: 1px solid rgba(255, 255, 255, 0.14) !important;
           border-radius: 14px;
-          box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
+          box-shadow: 0 8px 28px rgba(0, 0, 0, 0.7);
           display: none;
           flex-direction: column;
-          gap: 11px;
-          animation: flyoutFadeIn 0.15s ease forwards;
+          gap: 10px;
+          box-sizing: border-box;
+          z-index: 2147483647;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+        }
+
+        .flyout-card::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        .flyout-card::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 4px;
         }
 
         .flyout-card.visible {
           display: flex;
         }
 
-        @keyframes flyoutFadeIn {
+        /* Smart Vertical Placement: Open Above by default, Open Below if near top edge */
+        .flyout-card.placement-above {
+          bottom: calc(100% + 8px);
+          top: auto;
+          animation: flyoutFadeUp 0.14s ease forwards;
+        }
+
+        .flyout-card.placement-below {
+          top: calc(100% + 8px);
+          bottom: auto;
+          animation: flyoutFadeDown 0.14s ease forwards;
+        }
+
+        /* Smart Horizontal Placement: Align Right by default, Align Left if near left edge */
+        .flyout-card.align-right {
+          right: 0;
+          left: auto;
+        }
+
+        .flyout-card.align-left {
+          left: 0;
+          right: auto;
+        }
+
+        @keyframes flyoutFadeUp {
           from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes flyoutFadeDown {
+          from { opacity: 0; transform: translateY(-4px); }
           to { opacity: 1; transform: translateY(0); }
         }
 
@@ -427,8 +504,8 @@ class AuraFloatingWidget {
       </style>
 
       <div class="widget-container">
-        <!-- Settings Flyout Card -->
-        <div class="flyout-card" id="flyoutCard">
+        <!-- Settings Flyout Card (Absolute positioned, smart placed above or below) -->
+        <div class="flyout-card placement-above align-right" id="flyoutCard">
           <div class="card-header">
             <span class="card-title">AuraDark Tuning</span>
             <span class="pill-badge ${this.state.active ? 'active' : ''}" id="cardStatusBadge">
@@ -445,7 +522,23 @@ class AuraFloatingWidget {
               <button class="mode-btn ${this.state.preset === 'oled' ? 'active' : ''}" data-preset="oled">OLED Pitch</button>
               <button class="mode-btn ${this.state.preset === 'mocha' ? 'active' : ''}" data-preset="mocha">Warm Mocha</button>
               <button class="mode-btn ${this.state.preset === 'nord' ? 'active' : ''}" data-preset="nord">Nordic</button>
+              <button class="mode-btn ${this.state.preset === 'cyberpunk' ? 'active' : ''}" data-preset="cyberpunk">Cyberpunk</button>
+              <button class="mode-btn ${this.state.preset === 'emerald' ? 'active' : ''}" data-preset="emerald">Forest</button>
+              <button class="mode-btn ${this.state.preset === 'dracula' ? 'active' : ''}" data-preset="dracula">Dracula</button>
+              <button class="mode-btn ${this.state.preset === 'e-ink' ? 'active' : ''}" data-preset="e-ink">E-Ink</button>
             </div>
+          </div>
+
+          <!-- Quick Accessibility Toggles -->
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; padding:3px 0; border-top:1px solid rgba(255,255,255,0.06);">
+            <label style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#cbd5e1; cursor:pointer;">
+              <input type="checkbox" id="widgetBoostContrast" ${this.state.boostContrast ? 'checked' : ''} style="accent-color:#6366f1;">
+              <span>Boost Contrast</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:4px; font-size:9.5px; color:#cbd5e1; cursor:pointer;">
+              <input type="checkbox" id="widgetDyslexicFont" ${this.state.dyslexicFont ? 'checked' : ''} style="accent-color:#6366f1;">
+              <span>Dyslexia Font</span>
+            </label>
           </div>
 
           <div class="slider-group">
@@ -504,72 +597,111 @@ class AuraFloatingWidget {
   setupInteractions() {
     const pill = this.shadow.getElementById('mainPill');
     const expandBtn = this.shadow.getElementById('expandBtn');
-    const flyoutCard = this.shadow.getElementById('flyoutCard');
     const resetPosBtn = this.shadow.getElementById('resetPosBtn');
 
-    let isMoved = false;
+    // 1. Global Click-Outside Dismissal (Capture phase for 100% reliability)
+    const onGlobalPointerDown = (e) => {
+      if (!this.isExpanded) return;
+      const path = e.composedPath ? e.composedPath() : [];
+      if (!path.includes(this.host)) {
+        this.closeDropdown();
+      }
+    };
+    window.addEventListener('pointerdown', onGlobalPointerDown, true);
 
-    // Independent drag detection
-    pill.addEventListener('pointerdown', (e) => {
+    // 2. High-precision pointer dragging
+    let startX = 0;
+    let startY = 0;
+    let startPosX = 0;
+    let startPosY = 0;
+    let hasMoved = false;
+
+    const onPointerDown = (e) => {
       if (e.target.closest('#expandBtn') || e.target.closest('#flyoutCard')) {
         return;
       }
+      e.preventDefault();
       this.isDragging = true;
-      isMoved = false;
-      this.dragStart = { x: e.clientX, y: e.clientY };
-    });
+      hasMoved = false;
+      startX = e.clientX;
+      startY = e.clientY;
+      startPosX = this.currentPos.x;
+      startPosY = this.currentPos.y;
 
-    pill.addEventListener('pointermove', (e) => {
+      try { pill.setPointerCapture(e.pointerId); } catch (_) {}
+    };
+
+    const onPointerMove = (e) => {
       if (!this.isDragging) return;
-      const dx = this.dragStart.x - e.clientX;
-      const dy = this.dragStart.y - e.clientY;
+      const dx = startX - e.clientX;
+      const dy = startY - e.clientY;
 
-      if (!isMoved && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) {
-        isMoved = true;
+      if (!hasMoved && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
+        hasMoved = true;
         pill.classList.add('dragging');
-        try { pill.setPointerCapture(e.pointerId); } catch (_) {}
+        if (this.isExpanded) {
+          this.closeDropdown();
+        }
       }
 
-      if (isMoved) {
-        let newX = this.currentPos.x + dx;
-        let newY = this.currentPos.y + dy;
+      if (hasMoved) {
+        const pillW = 90;
+        const pillH = 28;
+        const maxW = Math.max(80, (window.innerWidth || 1024) - pillW - 10);
+        const maxH = Math.max(80, (window.innerHeight || 768) - pillH - 10);
 
-        const maxW = Math.max(160, window.innerWidth - 120);
-        const maxH = Math.max(160, window.innerHeight - 45);
+        let newX = startPosX + dx;
+        let newY = startPosY + dy;
+
         newX = Math.max(10, Math.min(maxW, newX));
         newY = Math.max(10, Math.min(maxH, newY));
 
-        this.currentPos = { x: newX, y: newY };
-        this.dragStart = { x: e.clientX, y: e.clientY };
+        this.currentPos.x = newX;
+        this.currentPos.y = newY;
         this.updateScreenPosition();
       }
-    });
+    };
 
-    pill.addEventListener('pointerup', (e) => {
+    const onPointerUp = (e) => {
       if (!this.isDragging) return;
       this.isDragging = false;
       pill.classList.remove('dragging');
       try { pill.releasePointerCapture(e.pointerId); } catch (_) {}
 
-      if (!isMoved && !e.target.closest('#expandBtn') && !e.target.closest('#flyoutCard')) {
+      if (!hasMoved) {
+        // Toggle dark mode on clean click
         this.toggle();
+      } else {
+        // Drag finished: update placement and save position
+        this.updateDropdownPlacement();
+        if (this.onPositionChange) {
+          this.onPositionChange(this.currentPos);
+        }
       }
+    };
 
-      if (isMoved) {
-        try {
-          if (typeof chrome !== 'undefined' && chrome.runtime?.id && chrome.storage?.local) {
-            chrome.storage.local.set({ auradark_widget_pos: this.currentPos });
-          }
-        } catch (_) {}
+    const onPointerCancel = () => {
+      if (this.isDragging) {
+        this.isDragging = false;
+        pill.classList.remove('dragging');
       }
-    });
+    };
 
+    pill.addEventListener('pointerdown', onPointerDown);
+    pill.addEventListener('pointermove', onPointerMove);
+    pill.addEventListener('pointerup', onPointerUp);
+    pill.addEventListener('pointercancel', onPointerCancel);
+
+    // Window listeners ensure pointer release is never missed
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointerup', onPointerUp, { passive: true });
+    window.addEventListener('pointercancel', onPointerCancel, { passive: true });
+
+    // 3. Dropdown Toggle Button
     expandBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      this.isExpanded = !this.isExpanded;
-      flyoutCard.classList.toggle('visible', this.isExpanded);
-      expandBtn.classList.toggle('open', this.isExpanded);
+      this.toggleDropdown();
     });
 
     if (resetPosBtn) {
@@ -613,6 +745,22 @@ class AuraFloatingWidget {
       this.state.contrast = val;
       this.notifyChange({ contrast: val });
     });
+
+    const boostCheck = this.shadow.getElementById('widgetBoostContrast');
+    if (boostCheck) {
+      boostCheck.addEventListener('change', (e) => {
+        this.state.boostContrast = e.target.checked;
+        this.notifyChange({ boostContrast: e.target.checked });
+      });
+    }
+
+    const dyslexicCheck = this.shadow.getElementById('widgetDyslexicFont');
+    if (dyslexicCheck) {
+      dyslexicCheck.addEventListener('change', (e) => {
+        this.state.dyslexicFont = e.target.checked;
+        this.notifyChange({ dyslexicFont: e.target.checked });
+      });
+    }
   }
 
   toggle() {
@@ -644,6 +792,22 @@ class AuraFloatingWidget {
     if (cardBadge) {
       cardBadge.classList.toggle('active', this.state.active);
       cardBadge.textContent = this.state.active ? 'Active' : 'Off';
+    }
+
+    if (this.state.preset) {
+      this.shadow.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-preset') === this.state.preset);
+      });
+    }
+
+    const boostCheck = this.shadow.getElementById('widgetBoostContrast');
+    if (boostCheck && this.state.boostContrast !== undefined) {
+      boostCheck.checked = Boolean(this.state.boostContrast);
+    }
+
+    const dyslexicCheck = this.shadow.getElementById('widgetDyslexicFont');
+    if (dyslexicCheck && this.state.dyslexicFont !== undefined) {
+      dyslexicCheck.checked = Boolean(this.state.dyslexicFont);
     }
   }
 }
