@@ -17,7 +17,10 @@
           </svg>
         </div>
         <div class="brand-text">
-          <h1>AuraDark</h1>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <h1>AuraDark</h1>
+            <span id="headerProBadge" style="display:none; background:linear-gradient(135deg, #f59e0b, #d97706); color:#000000; font-size:8.5px; font-weight:800; padding:1px 5px; border-radius:4px; letter-spacing:0.04em;">PRO</span>
+          </div>
           <span class="subtext">Eye Comfort & PDF Engine</span>
         </div>
       </div>
@@ -34,6 +37,18 @@
         <input type="checkbox" id="masterToggle" checked>
         <span class="slider"></span>
       </label>
+    </div>
+
+    <!-- Scope Selection: This Site Only vs All Tabs -->
+    <div class="scope-card" style="display:flex; justify-content:space-between; align-items:center; background:#171821; border:1px solid rgba(255,255,255,0.08); padding:9px 12px; border-radius:12px;">
+      <div style="display:flex; flex-direction:column; gap:2px;">
+        <span style="font-size:12px; color:#f1f5f9; font-weight:600;">Theme Scope</span>
+        <span style="font-size:10px; color:#94a3b8;" id="scopeDesc">Apply to this site only</span>
+      </div>
+      <div class="scope-toggle" style="display:flex; gap:2px; background:#0f1015; padding:2.5px; border-radius:8px; border:1px solid rgba(255,255,255,0.1);">
+        <button id="scopePerSiteBtn" class="scope-btn active" style="background:#4f46e5; color:#ffffff; border:none; padding:4px 8px; border-radius:5px; font-size:10px; font-weight:600; cursor:pointer; transition:all 0.15s ease;">This Site</button>
+        <button id="scopeGlobalBtn" class="scope-btn" style="background:transparent; color:#94a3b8; border:none; padding:4px 8px; border-radius:5px; font-size:10px; font-weight:600; cursor:pointer; transition:all 0.15s ease;">All Tabs</button>
+      </div>
     </div>
 
     <!-- Current Site Exclude Switch -->
@@ -117,6 +132,18 @@
         </div>
         <input type="range" id="inputContrast" min="80" max="120" value="100">
       </div>
+
+      <!-- Feature 3: Auto Night Warmth (Sunset/Sunrise Scheduler) -->
+      <label style="display:flex; justify-content:space-between; align-items:center; background:#171821; border:1px solid rgba(255,255,255,0.08); padding:8px 10px; border-radius:8px; cursor:pointer; font-size:11px; margin-top:8px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="font-weight:600; color:#f1f5f9;">Auto Night Warmth</span>
+            <span id="nightWarmthBadge" style="font-size:8.5px; font-weight:700; padding:1px 5px; border-radius:4px; letter-spacing:0.02em; background:rgba(255,255,255,0.06); color:#94a3b8;">Tracking</span>
+          </div>
+          <div style="font-size:9.5px; color:#94a3b8;" id="nightWarmthScheduleText">Scheduled (8:00 PM – 7:00 AM)</div>
+        </div>
+        <input type="checkbox" id="toggleAutoWarmth" style="accent-color:#6366f1; cursor:pointer;">
+      </label>
     </div>
 
     <!-- Accessibility Suite -->
@@ -150,10 +177,16 @@
     </div>
 
     <!-- Footer info & Quick Actions -->
-    <footer class="footer">
-      <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-        <span>Wispr Flow Widget Active</span>
-        <button id="resetWidgetBtn" style="background:none; border:none; color:#818cf8; font-size:10px; cursor:pointer; text-decoration:underline; padding:0;">Reset Widget</button>
+    <footer class="footer" style="display:flex; flex-direction:column; gap:6px; width:100%; padding-top:4px;">
+      <!-- Feature 5: Privacy & Local Verification Badge -->
+      <div style="display:flex; align-items:center; justify-content:center; gap:5px; padding:4px 0; font-size:9.5px; color:#94a3b8; border-top:1px solid rgba(255,255,255,0.06); width:100%;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <span>100% Local & Private • Zero Telemetry</span>
+      </div>
+      <div style="display:flex; justify-content:flex-end; width:100%;">
+        <button id="resetWidgetBtn" style="background:none; border:none; color:#818cf8; font-size:10px; cursor:pointer; text-decoration:underline; padding:0;">Reset Widget Position</button>
       </div>
     </footer>
   </div>

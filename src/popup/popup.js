@@ -42,12 +42,53 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const toggleBoost = document.getElementById('toggleBoostContrast');
   const toggleDyslexic = document.getElementById('toggleDyslexicFont');
+  const toggleAutoWarmth = document.getElementById('toggleAutoWarmth');
+  const nightWarmthBadge = document.getElementById('nightWarmthBadge');
+  const nightWarmthScheduleText = document.getElementById('nightWarmthScheduleText');
 
+  function updateNightScheduleBadge(isAutoWarmthEnabled) {
+    if (!nightWarmthBadge || !nightWarmthScheduleText) return;
+    const now = new Date();
+    const currentHour = now.getHours() + (now.getMinutes() / 60);
+    const isNight = currentHour >= 20 || currentHour < 7;
+    const timeStr = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+    if (!isAutoWarmthEnabled) {
+      nightWarmthBadge.textContent = 'OFF';
+      nightWarmthBadge.style.background = 'rgba(255, 255, 255, 0.08)';
+      nightWarmthBadge.style.color = '#94a3b8';
+      nightWarmthScheduleText.textContent = `Live at ${timeStr} • Disabled (Toggle to run 8 PM – 7 AM)`;
+      return;
+    }
+
+    if (isNight) {
+      nightWarmthBadge.textContent = '● ACTIVE (NIGHT)';
+      nightWarmthBadge.style.background = 'rgba(16, 185, 129, 0.2)';
+      nightWarmthBadge.style.color = '#34d399';
+      nightWarmthScheduleText.textContent = `Live at ${timeStr} • +25% warmth active till 7:00 AM`;
+    } else {
+      nightWarmthBadge.textContent = '○ SCHEDULED';
+      nightWarmthBadge.style.background = 'rgba(99, 102, 241, 0.2)';
+      nightWarmthBadge.style.color = '#a5b4fc';
+      nightWarmthScheduleText.textContent = `Live at ${timeStr} • Starts automatically at 8:00 PM`;
+    }
+  }
+
+  const scopePerSiteBtn = document.getElementById('scopePerSiteBtn');
+  const scopeGlobalBtn = document.getElementById('scopeGlobalBtn');
+  const scopeDesc = document.getElementById('scopeDesc');
+  const headerProBadge = document.getElementById('headerProBadge');
+
+  const licenseSection = document.getElementById('licenseSection');
   const btnEnterKey = document.getElementById('btnEnterKey');
   const keyInputRow = document.getElementById('keyInputRow');
   const licenseKeyInput = document.getElementById('licenseKeyInput');
   const btnActivateKey = document.getElementById('btnActivateKey');
   const licenseStatusText = document.getElementById('licenseStatusText');
+
+  let currentScopeMode = 'per_site';
+  let siteStates = {};
+  let sitePresets = {};
 
   function validateKey(raw) {
     if (!raw || typeof raw !== 'string') return false;
@@ -63,33 +104,89 @@ document.addEventListener('DOMContentLoaded', async () => {
     return parts[3] === expected;
   }
 
+  function updateScopeUI(mode) {
+    currentScopeMode = mode;
+    if (mode === 'per_site') {
+      scopePerSiteBtn?.classList.add('active');
+      scopeGlobalBtn?.classList.remove('active');
+      if (scopePerSiteBtn) { scopePerSiteBtn.style.background = '#4f46e5'; scopePerSiteBtn.style.color = '#ffffff'; }
+      if (scopeGlobalBtn) { scopeGlobalBtn.style.background = 'transparent'; scopeGlobalBtn.style.color = '#94a3b8'; }
+      if (scopeDesc) scopeDesc.textContent = 'Apply to this site only';
+      
+      const siteEnabled = siteStates[currentHostname] !== undefined ? siteStates[currentHostname] : masterToggle.checked;
+      masterToggle.checked = siteEnabled;
+      updateStatusText(siteEnabled);
+    } else {
+      scopeGlobalBtn?.classList.add('active');
+      scopePerSiteBtn?.classList.remove('active');
+      if (scopeGlobalBtn) { scopeGlobalBtn.style.background = '#4f46e5'; scopeGlobalBtn.style.color = '#ffffff'; }
+      if (scopePerSiteBtn) { scopePerSiteBtn.style.background = 'transparent'; scopePerSiteBtn.style.color = '#94a3b8'; }
+      if (scopeDesc) scopeDesc.textContent = 'Apply to all tabs globally';
+    }
+  }
+
+  function saveSettingUpdate(changed) {
+    if (currentScopeMode === 'per_site' && currentHostname) {
+      if (!sitePresets[currentHostname]) sitePresets[currentHostname] = {};
+      Object.assign(sitePresets[currentHostname], changed);
+      chrome.storage.local.set({ auradark_site_presets: sitePresets });
+    } else {
+      const updates = {};
+      if (changed.preset) updates.auradark_preset = changed.preset;
+      if (changed.brightness !== undefined) updates.auradark_brightness = changed.brightness;
+      if (changed.contrast !== undefined) updates.auradark_contrast = changed.contrast;
+      if (changed.warmth !== undefined) updates.auradark_warmth = changed.warmth;
+      chrome.storage.local.set(updates);
+    }
+    sendTabUpdate('update-settings', { settings: changed });
+  }
+
   // Load storage state
   chrome.storage.local.get([
     'auradark_enabled',
+    'auradark_scope_mode',
+    'auradark_site_states',
+    'auradark_site_presets',
     'auradark_preset',
     'auradark_brightness',
     'auradark_contrast',
     'auradark_warmth',
+    'auradark_auto_warmth',
     'auradark_boost_contrast',
     'auradark_dyslexic_font',
     'auradark_pro_unlocked',
     'auradark_disabled_domains'
   ], (stored) => {
-    const isEnabled = stored.auradark_enabled !== false;
+    currentScopeMode = stored.auradark_scope_mode || 'per_site';
+    siteStates = stored.auradark_site_states || {};
+    sitePresets = stored.auradark_site_presets || {};
+
+    let isEnabled = stored.auradark_enabled !== false;
+    if (currentScopeMode === 'per_site' && currentHostname) {
+      if (siteStates[currentHostname] !== undefined) {
+        isEnabled = Boolean(siteStates[currentHostname]);
+      }
+    }
+
     masterToggle.checked = isEnabled;
     updateStatusText(isEnabled);
+    updateScopeUI(currentScopeMode);
 
     disabledDomains = stored.auradark_disabled_domains || [];
     updateSiteButtonState();
 
-    // Presets
-    const activePreset = stored.auradark_preset || 'charcoal';
+    // Check if current site has custom preset and slider values
+    const currentSiteConfig = (currentScopeMode === 'per_site' && sitePresets[currentHostname])
+      ? sitePresets[currentHostname]
+      : {};
+
+    const activePreset = currentSiteConfig.preset || stored.auradark_preset || 'charcoal';
     setActivePreset(activePreset);
 
     // Sliders
-    const b = stored.auradark_brightness || 100;
-    const w = stored.auradark_warmth || 0;
-    const c = stored.auradark_contrast || 100;
+    const b = currentSiteConfig.brightness !== undefined ? currentSiteConfig.brightness : (stored.auradark_brightness || 100);
+    const w = currentSiteConfig.warmth !== undefined ? currentSiteConfig.warmth : (stored.auradark_warmth || 0);
+    const c = currentSiteConfig.contrast !== undefined ? currentSiteConfig.contrast : (stored.auradark_contrast || 100);
 
     bSlider.value = b;
     bVal.textContent = `${b}%`;
@@ -100,26 +197,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     cSlider.value = c;
     cVal.textContent = `${c}%`;
 
-    // Accessibility
+    // Accessibility & Features
     if (toggleBoost) toggleBoost.checked = Boolean(stored.auradark_boost_contrast);
     if (toggleDyslexic) toggleDyslexic.checked = Boolean(stored.auradark_dyslexic_font);
-
-    // License
-    const isPro = Boolean(stored.auradark_pro_unlocked);
-    if (licenseStatusText) {
-      licenseStatusText.textContent = isPro ? 'Unlocked (Pro Lifetime)' : 'Free Tier (Unlock Pro: ₹50 / $1)';
-      licenseStatusText.style.color = isPro ? '#4ade80' : '#94a3b8';
+    if (toggleAutoWarmth) {
+      const isAutoWarmth = Boolean(stored.auradark_auto_warmth);
+      toggleAutoWarmth.checked = isAutoWarmth;
+      updateNightScheduleBadge(isAutoWarmth);
     }
-    if (btnEnterKey && isPro) {
-      btnEnterKey.textContent = 'Active ✓';
-      btnEnterKey.style.borderColor = '#22c55e';
-      btnEnterKey.style.color = '#4ade80';
+
+    // License: If user is Pro, completely hide the license card!
+    const isPro = Boolean(stored.auradark_pro_unlocked);
+    if (licenseSection) {
+      licenseSection.style.display = isPro ? 'none' : 'block';
+    }
+    if (headerProBadge) {
+      headerProBadge.style.display = isPro ? 'inline-block' : 'none';
     }
   });
 
   function updateStatusText(active) {
-    masterStatusText.textContent = active ? 'Smart semantic theme active' : 'Dark mode paused';
-    masterStatusText.style.color = active ? '#818cf8' : '#94a3b8';
+    masterStatusText.textContent = active ? 'Active • Dark theme enabled' : 'Active • Light theme enabled';
+    masterStatusText.style.color = active ? '#818cf8' : '#38bdf8';
   }
 
   function updateSiteButtonState() {
@@ -154,12 +253,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Master Toggle event
+  // Scope Buttons event
+  if (scopePerSiteBtn) {
+    scopePerSiteBtn.addEventListener('click', () => {
+      updateScopeUI('per_site');
+      chrome.storage.local.set({ auradark_scope_mode: 'per_site' });
+      sendTabUpdate('update-settings', { scopeMode: 'per_site' });
+    });
+  }
+
+  if (scopeGlobalBtn) {
+    scopeGlobalBtn.addEventListener('click', () => {
+      updateScopeUI('global');
+      chrome.storage.local.set({ auradark_scope_mode: 'global' });
+      sendTabUpdate('update-settings', { scopeMode: 'global' });
+    });
+  }
+
+  // Master Toggle event (respects per-site vs global scope)
   masterToggle.addEventListener('change', () => {
     const isEnabled = masterToggle.checked;
     updateStatusText(isEnabled);
-    chrome.storage.local.set({ auradark_enabled: isEnabled });
-    sendTabUpdate('toggle-dark-mode', { enabled: isEnabled });
+
+    if (currentScopeMode === 'per_site' && currentHostname) {
+      siteStates[currentHostname] = isEnabled;
+      chrome.storage.local.set({ auradark_site_states: siteStates });
+      sendTabUpdate('toggle-dark-mode', { enabled: isEnabled, site: currentHostname, scope: 'per_site' });
+    } else {
+      chrome.storage.local.set({ auradark_enabled: isEnabled });
+      sendTabUpdate('toggle-dark-mode', { enabled: isEnabled, scope: 'global' });
+    }
   });
 
   // Site Toggle event
@@ -185,8 +308,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     btn.addEventListener('click', () => {
       const preset = btn.getAttribute('data-preset');
       setActivePreset(preset);
-      chrome.storage.local.set({ auradark_preset: preset });
-      sendTabUpdate('update-settings', { settings: { preset } });
+      saveSettingUpdate({ preset });
     });
   });
 
@@ -194,25 +316,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   bSlider.addEventListener('input', () => {
     const val = parseInt(bSlider.value, 10);
     bVal.textContent = `${val}%`;
-    chrome.storage.local.set({ auradark_brightness: val });
-    sendTabUpdate('update-settings', { settings: { brightness: val } });
+    saveSettingUpdate({ brightness: val });
   });
 
   // Warmth
   wSlider.addEventListener('input', () => {
     const val = parseInt(wSlider.value, 10);
     wVal.textContent = `${val}%`;
-    chrome.storage.local.set({ auradark_warmth: val });
-    sendTabUpdate('update-settings', { settings: { warmth: val } });
+    saveSettingUpdate({ warmth: val });
   });
 
   // Contrast
   cSlider.addEventListener('input', () => {
     const val = parseInt(cSlider.value, 10);
     cVal.textContent = `${val}%`;
-    chrome.storage.local.set({ auradark_contrast: val });
-    sendTabUpdate('update-settings', { settings: { contrast: val } });
+    saveSettingUpdate({ contrast: val });
   });
+
+  // Feature 3: Auto Night Warmth
+  if (toggleAutoWarmth) {
+    toggleAutoWarmth.addEventListener('change', () => {
+      const active = toggleAutoWarmth.checked;
+      updateNightScheduleBadge(active);
+      chrome.storage.local.set({ auradark_auto_warmth: active });
+      sendTabUpdate('update-settings', { settings: { autoWarmth: active } });
+    });
+  }
 
   // Accessibility Toggles
   if (toggleBoost) {
@@ -248,13 +377,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (validateKey(key)) {
         chrome.storage.local.set({ auradark_pro_unlocked: true });
         sendTabUpdate('update-settings', { settings: { proUnlocked: true } });
-        if (licenseStatusText) {
-          licenseStatusText.textContent = 'Unlocked (Pro Lifetime)';
-          licenseStatusText.style.color = '#4ade80';
+        if (licenseSection) {
+          licenseSection.style.display = 'none';
         }
-        btnEnterKey.textContent = 'Active ✓';
-        btnEnterKey.style.borderColor = '#22c55e';
-        btnEnterKey.style.color = '#4ade80';
+        if (headerProBadge) {
+          headerProBadge.style.display = 'inline-block';
+        }
         keyInputRow.style.display = 'none';
         alert('🎉 AuraDark Pro successfully activated! All 8 themes and features unlocked.');
       } else {

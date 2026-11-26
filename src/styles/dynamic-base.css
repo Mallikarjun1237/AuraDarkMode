@@ -7,97 +7,100 @@
  * in BOTH light and dark mode.
  */
 
-/* Root Perceptual Transformation (Active Dark Mode)
-   Sets background-color: #ffffff on body before inversion so that after 90% inversion
-   the page canvas and transparent sections render in dark charcoal (#151619). */
-html[data-auradark-active="true"] {
+/* =========================================================================
+   MODE 1: LIGHT-TO-DARK TRANSFORMATION (Natively light pages -> Dark mode)
+   ========================================================================= */
+html[data-auradark-active="true"][data-auradark-mode="light-to-dark"] {
+  color-scheme: dark !important;
   background-color: #121316 !important;
 }
 
-html[data-auradark-active="true"] > body {
-  filter: invert(90%) hue-rotate(180deg) contrast(92%) brightness(96%) !important;
+html[data-auradark-active="true"][data-auradark-mode="light-to-dark"] > body {
+  filter: invert(90%) hue-rotate(180deg) contrast(100%) brightness(96%) !important;
   background-color: #ffffff !important;
   min-height: 100vh !important;
 }
 
-/* Preset: OLED Pitch Black (Inverts white into pure #000000) */
-html[data-auradark-active="true"][data-auradark-preset="oled"] > body {
+/* Preset: OLED Pitch Black */
+html[data-auradark-active="true"][data-auradark-mode="light-to-dark"][data-auradark-preset="oled"] > body {
   filter: invert(100%) hue-rotate(180deg) contrast(105%) !important;
   background-color: #ffffff !important;
 }
 
-/* Preset: Warm Mocha (Reading & eye strain relief) */
-html[data-auradark-active="true"][data-auradark-preset="mocha"] > body {
-  filter: invert(88%) hue-rotate(180deg) sepia(30%) contrast(90%) brightness(94%) !important;
+/* Preset: Warm Mocha */
+html[data-auradark-active="true"][data-auradark-mode="light-to-dark"][data-auradark-preset="mocha"] > body {
+  filter: invert(88%) hue-rotate(180deg) sepia(30%) contrast(98%) brightness(95%) !important;
   background-color: #ffffff !important;
 }
 
 /* Preset: Nordic Slate */
-html[data-auradark-active="true"][data-auradark-preset="nord"] > body {
-  filter: invert(90%) hue-rotate(180deg) saturate(110%) contrast(94%) !important;
+html[data-auradark-active="true"][data-auradark-mode="light-to-dark"][data-auradark-preset="nord"] > body {
+  filter: invert(90%) hue-rotate(180deg) saturate(110%) contrast(100%) !important;
   background-color: #ffffff !important;
 }
 
-/* Preset: Cyberpunk Midnight (Deep indigo / electric night) */
-html[data-auradark-active="true"][data-auradark-preset="cyberpunk"] > body {
-  filter: invert(92%) hue-rotate(180deg) saturate(135%) contrast(98%) !important;
+/* Preset: Cyberpunk Midnight */
+html[data-auradark-active="true"][data-auradark-mode="light-to-dark"][data-auradark-preset="cyberpunk"] > body {
+  filter: invert(92%) hue-rotate(180deg) saturate(135%) contrast(102%) !important;
   background-color: #ffffff !important;
 }
 
-/* Preset: Forest Emerald (Calming moss & pine night) */
-html[data-auradark-active="true"][data-auradark-preset="emerald"] > body {
-  filter: invert(90%) hue-rotate(160deg) saturate(105%) contrast(93%) !important;
+/* Preset: Forest Emerald */
+html[data-auradark-active="true"][data-auradark-mode="light-to-dark"][data-auradark-preset="emerald"] > body {
+  filter: invert(90%) hue-rotate(160deg) saturate(105%) contrast(100%) !important;
   background-color: #ffffff !important;
 }
 
-/* Preset: Dracula Plum (Developer favorite dark violet) */
-html[data-auradark-active="true"][data-auradark-preset="dracula"] > body {
-  filter: invert(90%) hue-rotate(195deg) saturate(112%) contrast(95%) !important;
+/* Preset: Dracula Plum */
+html[data-auradark-active="true"][data-auradark-mode="light-to-dark"][data-auradark-preset="dracula"] > body {
+  filter: invert(90%) hue-rotate(195deg) saturate(112%) contrast(100%) !important;
   background-color: #ffffff !important;
 }
 
-/* Preset: E-Ink Paper (Monochrome reading & zero strain) */
-html[data-auradark-active="true"][data-auradark-preset="e-ink"] > body {
-  filter: invert(90%) hue-rotate(180deg) grayscale(100%) contrast(108%) !important;
+/* Preset: E-Ink Paper */
+html[data-auradark-active="true"][data-auradark-mode="light-to-dark"][data-auradark-preset="e-ink"] > body {
+  filter: invert(90%) hue-rotate(180deg) grayscale(100%) contrast(110%) !important;
   background-color: #ffffff !important;
 }
 
-/* Ambient Theme Tint Overlay: Ensures all 8 themes visibly tint dark-mode and light-mode sites */
-html[data-auradark-active="true"]::before {
-  content: "" !important;
-  position: fixed !important;
-  inset: 0 !important;
-  pointer-events: none !important;
-  z-index: 2147483640 !important;
-  mix-blend-mode: color !important;
-  transition: background-color 0.2s ease, opacity 0.2s ease !important;
+/* =========================================================================
+   MODE 2: NATIVE-DARK PRESERVATION (Already dark pages -> Keep dark)
+   Guarantees zero double inversion, white text stays white, white logos
+   stay white (e.g. Google Search, YouTube, GitHub).
+   ========================================================================= */
+html[data-auradark-active="true"][data-auradark-mode="native-dark"] {
+  color-scheme: dark !important;
 }
 
-html[data-auradark-active="true"][data-auradark-preset="charcoal"]::before {
-  background-color: rgba(30, 41, 59, 0.08) !important;
+html[data-auradark-active="true"][data-auradark-mode="native-dark"] > body {
+  filter: none !important;
 }
-html[data-auradark-active="true"][data-auradark-preset="oled"]::before {
-  background-color: rgba(0, 0, 0, 0.25) !important;
-  mix-blend-mode: multiply !important;
+
+/* =========================================================================
+   MODE 3: DARK-TO-LIGHT TRANSFORMATION (Natively dark pages -> Invert to Light)
+   Inverts natively dark pages into immaculate, high-contrast light mode
+   with crisp dark text and clean light paper backgrounds.
+   ========================================================================= */
+html[data-auradark-active="true"][data-auradark-mode="dark-to-light"] {
+  color-scheme: light !important;
+  background-color: #f8fafc !important;
 }
-html[data-auradark-active="true"][data-auradark-preset="mocha"]::before {
-  background-color: rgba(194, 149, 103, 0.18) !important;
+
+html[data-auradark-active="true"][data-auradark-mode="dark-to-light"] > body {
+  filter: invert(90%) hue-rotate(180deg) contrast(100%) brightness(98%) !important;
+  background-color: #121316 !important;
+  min-height: 100vh !important;
 }
-html[data-auradark-active="true"][data-auradark-preset="nord"]::before {
-  background-color: rgba(56, 189, 248, 0.16) !important;
-}
-html[data-auradark-active="true"][data-auradark-preset="cyberpunk"]::before {
-  background-color: rgba(217, 70, 239, 0.22) !important;
-}
-html[data-auradark-active="true"][data-auradark-preset="emerald"]::before {
-  background-color: rgba(16, 185, 129, 0.18) !important;
-}
-html[data-auradark-active="true"][data-auradark-preset="dracula"]::before {
-  background-color: rgba(168, 85, 247, 0.18) !important;
-}
-html[data-auradark-active="true"][data-auradark-preset="e-ink"]::before {
-  background-color: rgba(255, 255, 255, 0.10) !important;
-  mix-blend-mode: saturation !important;
+
+html[data-auradark-active="true"][data-auradark-mode="dark-to-light"] p,
+html[data-auradark-active="true"][data-auradark-mode="dark-to-light"] span,
+html[data-auradark-active="true"][data-auradark-mode="dark-to-light"] a,
+html[data-auradark-active="true"][data-auradark-mode="dark-to-light"] h1,
+html[data-auradark-active="true"][data-auradark-mode="dark-to-light"] h2,
+html[data-auradark-active="true"][data-auradark-mode="dark-to-light"] h3,
+html[data-auradark-active="true"][data-auradark-mode="dark-to-light"] li,
+html[data-auradark-active="true"][data-auradark-mode="dark-to-light"] td {
+  text-shadow: none !important;
 }
 
 /* =========================================================================
@@ -136,84 +139,107 @@ html[data-auradark-dyslexic="true"] td {
    icons always invert to light colors and remain 100% visible.
    ========================================================================= */
 
-html[data-auradark-active="true"] img:not([class*="icon"]):not([src*="icon"]):not([src*=".svg"]):not([data-icon]),
-html[data-auradark-active="true"] video,
-html[data-auradark-active="true"] iframe:not([src*=".pdf"]):not([src*="blob:"]),
-html[data-auradark-active="true"] embed:not([type="application/pdf"]),
-html[data-auradark-active="true"] object:not([type="application/pdf"]),
-html[data-auradark-active="true"] svg image {
+/* Counter-invert media ONLY when page is inverted (never on native-dark) */
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) img:not([class*="icon"]):not([src*="icon"]):not([src*=".svg"]):not([data-icon]),
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) video,
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) iframe:not([src*=".pdf"]):not([src*="blob:"]),
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) embed:not([type="application/pdf"]),
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) object:not([type="application/pdf"]),
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) svg image {
   filter: invert(100%) hue-rotate(180deg) !important;
 }
 
 /* User avatars and thumbnail photos ONLY — NEVER icons, glyphs, or layout containers */
-html[data-auradark-active="true"] [class*="avatar"]:empty,
-html[data-auradark-active="true"] [class*="profile-photo"]:empty,
-html[data-auradark-active="true"] [class*="user-img"]:empty,
-html[data-auradark-active="true"] [class*="thumbnail"]:empty {
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) [class*="avatar"]:empty,
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) [class*="profile-photo"]:empty,
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) [class*="user-img"]:empty,
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) [class*="thumbnail"]:empty {
   filter: invert(100%) hue-rotate(180deg) !important;
 }
 
 /* Icons, Material Symbols, SVGs, and Icon Fonts: GUARANTEED crisp white/light in dark mode */
-html[data-auradark-active="true"] .google-symbols,
-html[data-auradark-active="true"] .material-icons,
-html[data-auradark-active="true"] .material-symbols-outlined,
-html[data-auradark-active="true"] [class*="material-symbols"],
-html[data-auradark-active="true"] [class*="google-material"],
-html[data-auradark-active="true"] mat-icon,
-html[data-auradark-active="true"] [data-icon],
-html[data-auradark-active="true"] i[class*="fa-"],
-html[data-auradark-active="true"] i[class*="icon"],
-html[data-auradark-active="true"] span[class*="icon"],
-html[data-auradark-active="true"] div[class*="icon"]:empty {
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) .google-symbols,
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) .material-icons,
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) .material-symbols-outlined,
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) [class*="material-symbols"],
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) [class*="google-material"],
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) mat-icon,
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) [data-icon],
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) i[class*="fa-"],
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) i[class*="icon"],
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) span[class*="icon"],
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) div[class*="icon"]:empty {
   filter: none !important;
 }
 
 /* Canvases: counter-invert graphics/charts, but NEVER document or PDF canvases */
-html[data-auradark-active="true"] canvas:not([data-auradark-doc-canvas="true"]):not(.pdfViewer canvas):not([class*="pdf"] canvas):not([class*="document"] canvas):not([class*="reader"] canvas):not([class*="viewer"] canvas) {
+html[data-auradark-active="true"]:not([data-auradark-mode="native-dark"]) canvas:not([data-auradark-doc-canvas="true"]):not(.pdfViewer canvas):not([class*="pdf"] canvas):not([class*="document"] canvas):not([class*="reader"] canvas):not([class*="viewer"] canvas) {
   filter: invert(100%) hue-rotate(180deg) !important;
 }
 
 /* =========================================================================
    PDF, A4 SHEETS & DOCUMENT CANVAS DARK MODE
-   Since html root is already inverted, document embeds and canvases MUST NOT
-   be counter-inverted, so they render with dark paper and crisp white text.
+   Inverts document sheets into dark slate paper with crisp white text.
    ========================================================================= */
 
+/* Standalone PDF viewer embeds */
 html[data-auradark-active="true"] embed[type="application/pdf"],
 html[data-auradark-active="true"] object[type="application/pdf"] {
   filter: none !important;
   background-color: #121316 !important;
 }
 
-html[data-auradark-active="true"] div[data-animate-media-viewer="true"] canvas,
-html[data-auradark-active="true"] div[role="dialog"] canvas,
-html[data-auradark-active="true"] div[title*=".pdf"] canvas,
-html[data-auradark-active="true"] div[aria-label*="PDF"] canvas,
-html[data-auradark-active="true"] div[aria-label*="Document"] canvas,
-html[data-auradark-active="true"] .media-viewer canvas,
-html[data-auradark-active="true"] [class*="media-viewer"] canvas {
+/* Case 1: Body is inverted (light-to-dark) -> canvas inherits body inversion */
+html[data-auradark-mode="light-to-dark"] div[data-animate-media-viewer="true"] canvas,
+html[data-auradark-mode="light-to-dark"] div[role="dialog"] canvas,
+html[data-auradark-mode="light-to-dark"] div[title*=".pdf"] canvas,
+html[data-auradark-mode="light-to-dark"] div[aria-label*="PDF"] canvas,
+html[data-auradark-mode="light-to-dark"] div[aria-label*="Document"] canvas,
+html[data-auradark-mode="light-to-dark"] .media-viewer canvas,
+html[data-auradark-mode="light-to-dark"] [class*="media-viewer"] canvas,
+html[data-auradark-mode="light-to-dark"] .pdfViewer canvas,
+html[data-auradark-mode="light-to-dark"] .page canvas,
+html[data-auradark-mode="light-to-dark"] .canvasWrapper canvas,
+html[data-auradark-mode="light-to-dark"] [data-page-number] canvas,
+html[data-auradark-mode="light-to-dark"] .react-pdf__Page__canvas,
+html[data-auradark-mode="light-to-dark"] [class*="pdf"] canvas,
+html[data-auradark-mode="light-to-dark"] [class*="document"] canvas,
+html[data-auradark-mode="light-to-dark"] [class*="reader"] canvas,
+html[data-auradark-mode="light-to-dark"] [class*="viewer"] canvas,
+html[data-auradark-mode="light-to-dark"] [id*="viewer"] canvas,
+html[data-auradark-mode="light-to-dark"] [data-auradark-doc-canvas="true"] {
   filter: none !important;
   background-color: #16181d !important;
 }
 
-html[data-auradark-active="true"] .pdfViewer canvas,
-html[data-auradark-active="true"] .page canvas,
-html[data-auradark-active="true"] .canvasWrapper canvas,
-html[data-auradark-active="true"] [data-page-number] canvas,
-html[data-auradark-active="true"] .react-pdf__Page__canvas,
-html[data-auradark-active="true"] [class*="pdf"] canvas,
-html[data-auradark-active="true"] [class*="document"] canvas,
-html[data-auradark-active="true"] [class*="reader"] canvas,
-html[data-auradark-active="true"] [class*="viewer"] canvas,
-html[data-auradark-active="true"] [id*="viewer"] canvas,
-html[data-auradark-active="true"] [data-auradark-doc-canvas="true"] {
-  filter: none !important;
+/* Case 2: Body is NOT inverted (native-dark, e.g. WhatsApp Web) -> inverts white A4 canvas to dark slate! */
+html[data-auradark-mode="native-dark"] div[data-animate-media-viewer="true"] canvas,
+html[data-auradark-mode="native-dark"] div[role="dialog"] canvas,
+html[data-auradark-mode="native-dark"] div[title*=".pdf"] canvas,
+html[data-auradark-mode="native-dark"] div[aria-label*="PDF"] canvas,
+html[data-auradark-mode="native-dark"] div[aria-label*="Document"] canvas,
+html[data-auradark-mode="native-dark"] .media-viewer canvas,
+html[data-auradark-mode="native-dark"] [class*="media-viewer"] canvas,
+html[data-auradark-mode="native-dark"] .pdfViewer canvas,
+html[data-auradark-mode="native-dark"] .page canvas,
+html[data-auradark-mode="native-dark"] .canvasWrapper canvas,
+html[data-auradark-mode="native-dark"] [data-page-number] canvas,
+html[data-auradark-mode="native-dark"] .react-pdf__Page__canvas,
+html[data-auradark-mode="native-dark"] [class*="pdf"] canvas,
+html[data-auradark-mode="native-dark"] [class*="document"] canvas,
+html[data-auradark-mode="native-dark"] [class*="reader"] canvas,
+html[data-auradark-mode="native-dark"] [class*="viewer"] canvas,
+html[data-auradark-mode="native-dark"] [id*="viewer"] canvas,
+html[data-auradark-mode="native-dark"] [data-auradark-doc-canvas="true"] {
+  filter: invert(90%) hue-rotate(180deg) contrast(105%) brightness(95%) !important;
   background-color: #16181d !important;
 }
 
+/* Sheet paper containers, margins, and wrappers */
 html[data-auradark-active="true"] .pdfViewer .page,
 html[data-auradark-active="true"] .page[data-page-number],
-html[data-auradark-active="true"] .canvasWrapper {
+html[data-auradark-active="true"] .canvasWrapper,
+html[data-auradark-active="true"] [data-auradark-doc-parent="true"] {
   background-color: #16181d !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
 }

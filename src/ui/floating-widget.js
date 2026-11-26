@@ -509,7 +509,7 @@ class AuraFloatingWidget {
           <div class="card-header">
             <span class="card-title">AuraDark Tuning</span>
             <span class="pill-badge ${this.state.active ? 'active' : ''}" id="cardStatusBadge">
-              ${this.state.active ? 'Active' : 'Off'}
+              ${this.state.active ? 'Dark Mode' : 'Light Mode'}
             </span>
           </div>
 
@@ -581,7 +581,7 @@ class AuraFloatingWidget {
           <div class="pill-label" id="pillLabel">
             <span>AuraDark</span>
             <span class="pill-badge ${this.state.active ? 'active' : ''}" id="pillStatusBadge">
-              ${this.state.active ? 'ON' : 'OFF'}
+              ${this.state.active ? 'DARK' : 'LIGHT'}
             </span>
           </div>
           <button class="expand-btn" id="expandBtn" title="Tune Settings & Presets">
@@ -787,11 +787,11 @@ class AuraFloatingWidget {
     if (indicator) indicator.classList.toggle('active', this.state.active);
     if (badge) {
       badge.classList.toggle('active', this.state.active);
-      badge.textContent = this.state.active ? 'ON' : 'OFF';
+      badge.textContent = this.state.active ? 'DARK' : 'LIGHT';
     }
     if (cardBadge) {
       cardBadge.classList.toggle('active', this.state.active);
-      cardBadge.textContent = this.state.active ? 'Active' : 'Off';
+      cardBadge.textContent = this.state.active ? 'Dark Mode' : 'Light Mode';
     }
 
     if (this.state.preset) {
